@@ -43,7 +43,7 @@ class UsersSchema(ma.Schema):
     role = ma.fields.String(dump_default="User")
     is_active = ma.fields.Boolean(dump_default=True)
 
-    preferences = ma.fields.Nested("UserPreferencesSchema", only=['display_name'])
+    preferences = ma.fields.Nested("UsersPreferencesSchema", only=['display_name'])
     recipes = ma.fields.Nested("RecipesSchema", many=True, exclude=['created_by'])
 
 user_schema = UsersSchema()

@@ -29,7 +29,7 @@ class RecipesIngredientsSchema(ma.Schema):
 
     measurement = ma.fields.String(required=True)
 
-    recipe = ma.fields.Nested("RecipesSchema", exclude=['ingredients', 'directions'])
+    recipe = ma.fields.Nested("RecipesSchema", exclude=['ingredients', 'directions', 'images'])
     ingredient = ma.fields.Nested("IngredientsSchema", exclude=['recipes'])
 
 

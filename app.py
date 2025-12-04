@@ -1,7 +1,7 @@
 from flask import Flask
 import os
 
-# from util.blueprints import register_blueprint
+from util.blueprints import register_blueprint
 from .db import *
 
 
@@ -24,7 +24,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 init_db(app , db)
 
-# register_blueprint(app)
+register_blueprint(app)
 
 
 def create_tables():

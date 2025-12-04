@@ -4,7 +4,7 @@ import uuid
 
 from db import db
 
-class UserPreferences(db.Model):
+class UsersPreferences(db.Model):
     __tablename__ = "UsersPreferences"
 
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), primary_key=True, default=uuid.uuid4)
@@ -19,10 +19,10 @@ class UserPreferences(db.Model):
         self.dark_mode = dark_mode
 
     def new_user_preference_obj():
-        return UserPreferences(None, True)
+        return UsersPreferences(None, True)
 
 
-class UserPreferencesSchema(ma.Schema):
+class UsersPreferencesSchema(ma.Schema):
     class Meta:
         fields = ['user_id', 'display_name', 'dark_mode', 'user']
 
@@ -33,5 +33,5 @@ class UserPreferencesSchema(ma.Schema):
     user = ma.fields.Nested("UsersSchema", exclude=['user_id', 'preferences'])
 
 
-user_preference_schema = UserPreferencesSchema()
-user_preferences_schema = UserPreferencesSchema(many=True)
+user_preference_schema = UsersPreferencesSchema()
+users_preferences_schema = UsersPreferencesSchema(many=True)
