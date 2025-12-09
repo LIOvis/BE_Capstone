@@ -91,7 +91,7 @@ def update_cuisine_by_id(cuisine_id, auth_info):
 def delete_cuisine_by_id(cuisine_id, auth_info):
     query = db.session.query(Cuisines).filter(Cuisines.cuisine_id == cuisine_id).first()
 
-    if auth_info.user.user_id != "Super Admin":
+    if auth_info.user.role != "Super Admin":
         return jsonify({"message": "forbidden: higher role required"}), 403
     
     if not query:

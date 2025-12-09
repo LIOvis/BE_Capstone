@@ -88,7 +88,7 @@ def update_ingredient_by_id(ingredient_id, auth_info):
 def delete_ingredient_by_id(ingredient_id, auth_info):
     query = db.session.query(Ingredients).filter(Ingredients.ingredient_id == ingredient_id).first()
 
-    if auth_info.user.user_id != "Super Admin":
+    if auth_info.user.role != "Super Admin":
         return jsonify({"message": "forbidden: higher role required"}), 403
     
     if not query:
