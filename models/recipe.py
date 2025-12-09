@@ -29,7 +29,7 @@ class Recipes(db.Model):
         self.directions = directions
         self.is_active = is_active
 
-    def new_user_preference_obj():
+    def new_recipe_obj():
         return Recipes("", "", None, None, "", True)
 
 

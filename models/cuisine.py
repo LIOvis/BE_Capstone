@@ -15,7 +15,7 @@ class Cuisines(db.Model):
     def __init__(self, cuisine_name):
         self.cuisine_name = cuisine_name
 
-    def new_user_preference_obj():
+    def new_cuisine_obj():
         return Cuisines("")
 
 

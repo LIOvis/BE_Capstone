@@ -19,7 +19,7 @@ class RecipesIngredients(db.Model):
         self.ingredient_id = ingredient_id
         self.measurement = measurement
 
-    def new_user_preference_obj():
+    def new_recipe_ingredient_obj():
         return RecipesIngredients("", "", "")
 
 

@@ -16,7 +16,8 @@ class CuisinesRecipes(db.Model):
     def __init__(self, cuisine_id, recipe_id):
         self.cuisine_id = cuisine_id
         self.recipe_id = recipe_id
-    def new_user_preference_obj():
+
+    def new_recipe_cuisine_obj():
         return CuisinesRecipes("", "")
 
 
@@ -28,5 +29,5 @@ class CuisinesRecipesSchema(ma.Schema):
     recipe = ma.fields.Nested("RecipesSchema", exclude=['cuisines', 'directions', 'images'])
 
 
-cuisines_recipe_schema = CuisinesRecipesSchema()
-cuisiness_recipes_schema = CuisinesRecipesSchema(many=True)
+cuisine_recipe_schema = CuisinesRecipesSchema()
+cuisines_recipes_schema = CuisinesRecipesSchema(many=True)

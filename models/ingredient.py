@@ -17,7 +17,7 @@ class Ingredients(db.Model):
         self.name = name
         self.is_active = is_active
 
-    def new_user_preference_obj():
+    def new_ingredient_obj():
         return Ingredients("", True)
 
 
