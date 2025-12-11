@@ -14,16 +14,18 @@ from db import db
 @authenticate_return_auth
 def add_recipe(auth_info):
     post_data = request.form if request.form else request.json
-
-    if 'user_id' in post_data:
-        if post_data.get('user_id') != auth_info.user_id and auth_info.user.role != 'Super Admin':
-            return jsonify({"message":  "forbidden: higher role required to add a recipe to another user"}), 403
     
     new_recipe = Recipes.new_recipe_obj()
 
     populate_object(new_recipe, post_data)
 
-    new_recipe["user_id"] = auth_info.user_id
+    if 'user_id' in post_data:
+        if post_data.get('user_id') != auth_info.user_id and auth_info.user.role != 'Super Admin':
+            return jsonify({"message":  "forbidden: higher role required to add a recipe to another user"}), 403
+    else:
+            new_recipe.user_id = auth_info.user_id
+
+
 
     try:
         db.session.add(new_recipe)
@@ -55,7 +57,7 @@ def add_ingredient_to_recipe(recipe_id, auth_info):
 
     populate_object(new_recipe_ingredient, post_data)
 
-    new_recipe_ingredient["recipe_id"] = recipe_id
+    new_recipe_ingredient.recipe_id = recipe_id
 
     try:
         db.session.add(new_recipe_ingredient)
@@ -87,7 +89,7 @@ def add_cuisine_to_recipe(recipe_id, auth_info):
 
     populate_object(new_recipe_cuisine, post_data)
 
-    new_recipe_cuisine["recipe_id"] = recipe_id
+    new_recipe_cuisine.recipe_id = recipe_id
 
     try:
         db.session.add(new_recipe_cuisine)
@@ -234,3 +236,45 @@ def delete_recipe_by_id(recipe_id, auth_info):
         return jsonify({"message": "unable to delete recipe"}), 400
 
     return jsonify({"message": "recipe deleted"}), 200
+
+
+@authenticate_return_auth
+def delete_ingredient_from_recipe(recipe_id, ingredient_id, auth_info):
+    query = db.session.query(RecipesIngredients).filter(RecipesIngredients.recipe_id == recipe_id, RecipesIngredients.ingredient_id == ingredient_id).first()
+    
+    if not query:
+        return jsonify({"message": "ingredient not found in recipe"}), 404
+
+    if auth_info.user.role != "Super Admin" and auth_info.user_id != query.recipe.user_id:
+        return jsonify({"message": "forbidden: higher role required to delete an ingredient from another user's recipe"}), 403
+    
+    try:
+        db.session.delete(query)
+        db.session.commit()
+
+    except:
+        db.session.rollback()
+        return jsonify({"message": "unable to delete ingredient from recipe"}), 400
+
+    return jsonify({"message": "ingredient deleted from recipe"}), 200
+
+
+@authenticate_return_auth
+def delete_cuisine_from_recipe(recipe_id, cuisine_id, auth_info):
+    query = db.session.query(CuisinesRecipes).filter(CuisinesRecipes.recipe_id == recipe_id, CuisinesRecipes.cuisine_id == cuisine_id).first()
+    
+    if not query:
+        return jsonify({"message": "cuisine not found in recipe"}), 404
+
+    if auth_info.user.role != "Super Admin" and auth_info.user_id != query.recipe.user_id:
+        return jsonify({"message": "forbidden: higher role required to delete a cuisine from another user's recipe"}), 403
+    
+    try:
+        db.session.delete(query)
+        db.session.commit()
+
+    except:
+        db.session.rollback()
+        return jsonify({"message": "unable to delete cuisine from recipe"}), 400
+
+    return jsonify({"message": "cuisine deleted from recipe"}), 200

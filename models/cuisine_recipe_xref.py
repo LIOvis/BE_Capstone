@@ -23,7 +23,7 @@ class CuisinesRecipes(db.Model):
 
 class CuisinesRecipesSchema(ma.Schema):
     class Meta:
-        fields = ['measurement', 'recipe', 'ingredient']
+        fields = ['recipe', 'cuisine']
 
     cuisine = ma.fields.Nested("CuisinesSchema", exclude=['recipes'])
     recipe = ma.fields.Nested("RecipesSchema", exclude=['cuisines', 'directions', 'images'])

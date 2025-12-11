@@ -8,7 +8,7 @@ from db import db
 
 @authenticate_return_auth
 def add_cuisine(auth_info):
-    if auth_info.user.roll != 'User':
+    if auth_info.user.role != 'User':
         post_data = request.form if request.form else request.json
         
         new_cuisine = Cuisines.new_cuisine_obj()

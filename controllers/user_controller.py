@@ -1,3 +1,4 @@
+from flask_bcrypt import generate_password_hash
 from flask import jsonify, request
 
 from models.user import Users, user_schema, users_schema
@@ -8,12 +9,18 @@ from db import db
 
 
 def add_user():
-
     post_data = request.form if request.form else request.json
-    
+
     new_user = Users.new_user_obj()
 
     populate_object(new_user, post_data)
+    
+    if 'password' in post_data:
+        new_user.password = generate_password_hash(new_user.password).decode('utf8')
+
+    if 'role' in post_data:
+        if new_user.role not in ['User', 'Admin', 'Super Admin']:
+            return jsonify({"message": "role must be User, Admin, or Super Admin (case sensitive)"}), 400
 
     try:
         db.session.add(new_user)
@@ -77,6 +84,13 @@ def update_user_by_id(user_id, auth_info):
 
     if not query:
         return jsonify({"message": "user not found"}), 404
+    
+    if 'role' in post_data:
+        if auth_info.user.role != "Super Admin":
+            return jsonify({"message": "forbidden: higher role required to change a user's role"}), 400
+        
+        if post_data.get("role") not in ['User', 'Admin', 'Super Admin']:
+            return jsonify({"message": "role must be User, Admin, or Super Admin (case sensitive)"}), 400
     
     populate_object(query, post_data)
 

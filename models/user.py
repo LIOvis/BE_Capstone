@@ -13,10 +13,10 @@ class Users(db.Model):
     email = db.Column(db.String(), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
     date_joined = db.Column(db.Date(), default=datetime.today().date())
-    role = db.Column(db.String(), defualt="User")
+    role = db.Column(db.String(), default="User")
     is_active = db.Column(db.Boolean(), default=True)
 
-    preferences = db.relationship("UserPreferences", back_populates="user", cascade="all")
+    preferences = db.relationship("UsersPreferences", back_populates="user", cascade="all", uselist=False)
     recipes = db.relationship("Recipes", back_populates="created_by", cascade="all")
     auth = db.relationship("AuthTokens", back_populates="user", cascade="all")
 

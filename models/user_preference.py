@@ -11,7 +11,7 @@ class UsersPreferences(db.Model):
     display_name = db.Column(db.String())
     dark_mode = db.Column(db.Boolean(), default=True)
 
-    user = db.relationship("Users", back_populates="preferences")
+    user = db.relationship("Users", back_populates="preferences", uselist=False)
 
 
     def __init__(self, display_name, dark_mode=True):

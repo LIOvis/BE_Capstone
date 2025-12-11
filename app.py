@@ -2,7 +2,7 @@ from flask import Flask
 import os
 
 from util.blueprints import register_blueprint
-from .db import *
+from db import *
 
 
 flask_host = os.environ.get('FLASK_HOST')
@@ -21,8 +21,12 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'{database_scheme}{database_user}@{database_address}:{database_port}/{database_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-init_db(app , db)
+init_db(app, db)
 
 register_blueprint(app)
 

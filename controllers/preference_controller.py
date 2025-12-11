@@ -10,7 +10,7 @@ from db import db
 def add_user_preference(auth_info):
     post_data = request.form if request.form else request.json
 
-    if 'user_id' in post_data and (post_data.get("user_id") != auth_info.user_id or auth_info.user.role != "Super Admin"):
+    if 'user_id' in post_data and (post_data.get("user_id") != auth_info.user_id and auth_info.user.role != "Super Admin"):
         return jsonify({"message": "forbidden: higher role required to add user preferences to another user"}), 403
     
     new_user_preference = UsersPreferences.new_user_preference_obj()
@@ -56,7 +56,7 @@ def update_user_preference_by_id(user_id, auth_info):
     post_data = request.form if request.form else request.json
     query = db.session.query(UsersPreferences).filter(UsersPreferences.user_id == user_id).first()
 
-    if auth_info.user.role != 'Super Admin' or auth_info.user_id != user_id:
+    if auth_info.user.role != 'Super Admin' and auth_info.user_id != user_id:
         return jsonify({"message": "forbidden: higher role required to update another user's preferences"}), 403
 
     if not query:
@@ -78,7 +78,7 @@ def update_user_preference_by_id(user_id, auth_info):
 def delete_user_preference_by_id(user_id, auth_info):
     query = db.session.query(UsersPreferences).filter(UsersPreferences.user_id == user_id).first()
 
-    if auth_info.user.role != 'Super Admin' or auth_info.user_id != user_id:
+    if auth_info.user.role != 'Super Admin' and auth_info.user_id != user_id:
         return jsonify({"message": "forbidden: higher role required to delete another user's preferences"}), 403    
     
     if not query:

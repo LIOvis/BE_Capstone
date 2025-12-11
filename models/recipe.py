@@ -16,9 +16,9 @@ class Recipes(db.Model):
     is_active = db.Column(db.Boolean(), default=True)
 
     created_by = db.relationship("Users", back_populates="recipes")
-    cuisines = db.relationship("CuisinesRecipes", back_populates="recipe", cascade="all"),
+    cuisines = db.relationship("CuisinesRecipes", back_populates="recipe", cascade="all")
     ingredients = db.relationship("RecipesIngredients", back_populates="recipe", cascade="all")
-    images = db.relationship("Images", backpopulates="recipe", cascade="all")
+    images = db.relationship("Images", back_populates="recipe", cascade="all")
 
 
     def __init__(self, user_id, recipe_name, prep_time, cook_time, directions, is_active=True):
