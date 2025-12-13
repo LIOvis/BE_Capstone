@@ -18,7 +18,7 @@ class CuisinesRecipes(db.Model):
         self.recipe_id = recipe_id
 
     def new_recipe_cuisine_obj():
-        return CuisinesRecipes("", "")
+        return CuisinesRecipes(None, None)
 
 
 class CuisinesRecipesSchema(ma.Schema):

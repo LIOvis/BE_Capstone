@@ -30,7 +30,7 @@ class Recipes(db.Model):
         self.is_active = is_active
 
     def new_recipe_obj():
-        return Recipes("", "", None, None, "", True)
+        return Recipes(None, None, None, None, None, True)
 
 
 class RecipesSchema(ma.Schema):

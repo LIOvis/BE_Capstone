@@ -8,7 +8,7 @@ class Ingredients(db.Model):
     __tablename__ = "Ingredients"
 
     ingredient_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column(db.String(), unique=True, nullable=False)
+    ingredient_name = db.Column(db.String(), unique=True, nullable=False)
     is_active = db.Column(db.Boolean(), default=True)
 
     recipes = db.relationship("RecipesIngredients", back_populates="ingredient", cascade="all")
@@ -18,7 +18,7 @@ class Ingredients(db.Model):
         self.is_active = is_active
 
     def new_ingredient_obj():
-        return Ingredients("", True)
+        return Ingredients(None, True)
 
 
 class IngredientsSchema(ma.Schema):

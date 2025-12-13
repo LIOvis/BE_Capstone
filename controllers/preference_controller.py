@@ -21,9 +21,9 @@ def add_user_preference(auth_info):
         db.session.add(new_user_preference)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add user preferences", "error": str(e)}), 400
+        return jsonify({"message": "unable to add user preferences"}), 400
     
     return jsonify({"message": "user preferences added", "result": user_preference_schema.dump(new_user_preference)}), 201
     

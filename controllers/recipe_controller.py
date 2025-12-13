@@ -31,9 +31,9 @@ def add_recipe(auth_info):
         db.session.add(new_recipe)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add recipe", "error": str(e)}), 400
+        return jsonify({"message": "unable to add recipe"}), 400
     
     return jsonify({"message": "recipe added", "result": recipe_schema.dump(new_recipe)}), 201
     
@@ -49,6 +49,9 @@ def add_ingredient_to_recipe(recipe_id, auth_info):
 
     if not ingredient_query:
         return jsonify({"message": "ingredient not found"}), 404
+    
+    if ingredient_query.is_active == False:
+        return jsonify({"message": "cannot add an inactive ingredient"}), 400
 
     if recipe_query.user_id != auth_info.user_id and auth_info.user.role != 'Super Admin':
         return jsonify({"message":  "forbidden: higher role required to add an ingredient to another user's recipe"}), 403
@@ -63,9 +66,9 @@ def add_ingredient_to_recipe(recipe_id, auth_info):
         db.session.add(new_recipe_ingredient)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add ingredient to recipe", "error": str(e)}), 400
+        return jsonify({"message": "unable to add ingredient to recipe"}), 400
     
     return jsonify({"message": "ingredient added to recipe", "result": recipe_ingredient_schema.dump(new_recipe_ingredient)}), 201
 
@@ -81,6 +84,9 @@ def add_cuisine_to_recipe(recipe_id, auth_info):
 
     if not cuisine_query:
         return jsonify({"message": "cuisine not found"}), 404
+    
+    if cuisine_query.is_active == False:
+        return jsonify({"message": "cannot add an inactive cuisine"}), 400
 
     if recipe_query.user_id != auth_info.user_id and auth_info.user.role != 'Super Admin':
         return jsonify({"message":  "forbidden: higher role required to add a cuisine to another user's recipe"}), 403
@@ -95,9 +101,9 @@ def add_cuisine_to_recipe(recipe_id, auth_info):
         db.session.add(new_recipe_cuisine)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add cuisine to recipe", "error": str(e)}), 400
+        return jsonify({"message": "unable to add cuisine to recipe"}), 400
     
     return jsonify({"message": "cuisine added to recipe", "result": cuisine_recipe_schema.dump(new_recipe_cuisine)}), 201
 
@@ -109,11 +115,11 @@ def get_all_recipes(auth_info):
     recipes = recipes_schema.dump(query)
 
     if auth_info.user.role == "User":
+        active_recipes = []
         for recipe in recipes:
-            active_recipes = []
-            if recipe.is_active == True:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                 active_recipes.append(recipe)
-            recipe.recipes = active_recipes
+        recipes = active_recipes
 
     return jsonify({"message": "recipes found", "results": recipes}), 200
     
@@ -133,42 +139,42 @@ def get_recipe_by_id(recipe_id, auth_info):
 
 @authenticate_return_auth
 def get_recipes_by_ingredient(ingredient_id, auth_info):
-    ingredient_query = db.session.query(Ingredients).filter(Ingredients.ingredient_id == ingredient_id).first()
+    ingredient_query = db.session.query(Ingredients).filter(Ingredients.ingredient_id == ingredient_id).all()
 
     if not ingredient_query:
         return jsonify({"message": "ingredient not found"}), 404
 
-    query = db.session.query(Recipes).filter(Recipes.ingredients.ingredient_id == ingredient_id).all()
+    query = db.session.query(Recipes).filter(Recipes.ingredients.any(ingredient_id=ingredient_id)).all()
 
     recipes = recipes_schema.dump(query)
 
     if auth_info.user.role == "User":
+        active_recipes = []
         for recipe in recipes:
-            active_recipes = []
-            if recipe.is_active == True:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                 active_recipes.append(recipe)
-            recipe.recipes = active_recipes
+        recipes = active_recipes
 
     return jsonify({"message": "recipes found", "results": recipes}), 200
 
 
 @authenticate_return_auth
 def get_recipes_by_cuisine(cuisine_id, auth_info):
-    cuisine_query = db.session.query(Cuisines).filter(Cuisines.cuisine_id == cuisine_id).first()
+    cuisine_query = db.session.query(Cuisines).filter(Cuisines.cuisine_id == cuisine_id).all()
 
     if not cuisine_query:
         return jsonify({"message": "cuisine not found"}), 404
     
-    query = db.session.query(Recipes).filter(Recipes.cuisines.cuisine_id == cuisine_id).all()
+    query = db.session.query(Recipes).filter(Recipes.cuisines.any(cuisine_id=cuisine_id)) .all()
 
     recipes = recipes_schema.dump(query)
 
     if auth_info.user.role == "User":
+        active_recipes = []
         for recipe in recipes:
-            active_recipes = []
-            if recipe.is_active == True:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                 active_recipes.append(recipe)
-            recipe.recipes = active_recipes
+        recipes = active_recipes
 
     return jsonify({"message": "recipes found", "results": recipes}), 200
 
@@ -185,11 +191,12 @@ def get_recipes_by_user(user_id, auth_info):
     recipes = recipes_schema.dump(query)
 
     if auth_info.user.role == "User":
+        active_recipes = []
         for recipe in recipes:
-            active_recipes = []
-            if recipe.is_active == True:
+            recipe_query = db.session.query(Recipes).filter(Recipes.recipe_id == recipe["recipe_id"]).first()
+            if recipe_query.is_active == True or recipe_query.user_id == auth_info.user_id:
                 active_recipes.append(recipe)
-            recipe.recipes = active_recipes
+        recipes = active_recipes
 
     return jsonify({"message": "recipes found", "results": recipes}), 200
 
@@ -202,7 +209,7 @@ def update_recipe_by_id(recipe_id, auth_info):
     if not query:
         return jsonify({"message": "recipe not found"}), 404
 
-    if auth_info.user.role != 'Super Admin' and auth_info.user_id == query.user_id:
+    if auth_info.user.role != 'Super Admin' and auth_info.user_id != query.user_id:
         return jsonify({"message": "forbidden: higher role required to update another user's recipe"}), 403
     
     populate_object(query, post_data)

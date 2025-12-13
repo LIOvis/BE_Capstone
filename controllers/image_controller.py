@@ -41,9 +41,9 @@ def add_image(auth_info):
         db.session.add(new_image)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add image", "error": str(e)}), 400
+        return jsonify({"message": "unable to add image"}), 400
     
     return jsonify({"message": "image added", "result": image_schema.dump(new_image)}), 201
     
@@ -57,7 +57,7 @@ def get_all_images(auth_info):
 
     if auth_info.user.role == "User":
         for image in images:
-            if image.recipe.is_active == True:
+            if image["recipe"]["is_active"] == True or image["recipe"]["user_id"] == auth_info.user_id:
                 images_list.append(image)
     else:
         images_list = images

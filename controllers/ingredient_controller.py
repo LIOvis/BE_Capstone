@@ -18,9 +18,9 @@ def add_ingredient():
         db.session.add(new_ingredient)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add ingredient", "error": str(e)}), 400
+        return jsonify({"message": "unable to add ingredient"}), 400
     
     return jsonify({"message": "ingredient added", "result": ingredient_schema.dump(new_ingredient)}), 201
     
@@ -34,10 +34,10 @@ def get_all_ingredients(auth_info):
     if auth_info.user.role == "User":
         for ingredient in ingredients:
             active_recipes = []
-            for recipe in ingredient.recipes:
-                if recipe.is_active == "True":
+            for recipe in ingredient["recipes"]:
+                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                     active_recipes.append(recipe)
-            ingredient.recipes = active_recipes
+            ingredient["recipes"] = active_recipes
 
     return jsonify({"message": "ingredients found", "results": ingredients}), 200
     
@@ -53,10 +53,10 @@ def get_ingredient_by_id(ingredient_id, auth_info):
     
     if auth_info.user.role == "User": 
         active_recipes = []
-        for recipe in ingredient.recipes:
-            if recipe.is_active == "True":
+        for recipe in ingredient["recipes"]:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                 active_recipes.append(recipe)
-        ingredient.recipes = active_recipes
+        ingredient["recipes"] = active_recipes
     
     return jsonify({"message": "ingredient found", "result": ingredient}), 200
 

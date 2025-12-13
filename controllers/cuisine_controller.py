@@ -19,9 +19,9 @@ def add_cuisine(auth_info):
             db.session.add(new_cuisine)
             db.session.commit()
 
-        except Exception as e:
+        except:
             db.session.rollback()
-            return jsonify({"message": "unable to add cuisine", "error": str(e)}), 400
+            return jsonify({"message": "unable to add cuisine"}), 400
         
         return jsonify({"message": "cuisine added", "result": cuisine_schema.dump(new_cuisine)}), 201
     
@@ -37,10 +37,10 @@ def get_all_cuisines(auth_info):
     if auth_info.user.role == "User":
         for cuisine in cuisines:
             active_recipes = []
-            for recipe in cuisine.recipes:
-                if recipe.is_active == "True":
+            for recipe in cuisine["recipes"]:
+                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                     active_recipes.append(recipe)
-            cuisine.recipes = active_recipes
+            cuisine["recipes"] = active_recipes
 
     return jsonify({"message": "cuisines found", "results": cuisines}), 200
     
@@ -56,10 +56,10 @@ def get_cuisine_by_id(cuisine_id, auth_info):
     
     if auth_info.user.role == "User": 
         active_recipes = []
-        for recipe in cuisine.recipes:
-            if recipe.is_active == "True":
+        for recipe in cuisine["recipes"]:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
                 active_recipes.append(recipe)
-        cuisine.recipes = active_recipes
+        cuisine["recipes"] = active_recipes
     
     return jsonify({"message": "cuisine found", "result": cuisine}), 200
 

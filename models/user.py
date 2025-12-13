@@ -29,7 +29,7 @@ class Users(db.Model):
         self.is_active = is_active
 
     def new_user_obj():
-        return Users("", "", "", datetime.today().now(), "User", True)
+        return Users(None, None, None, datetime.today().now(), "User", True)
 
 
 class UsersSchema(ma.Schema):
@@ -44,7 +44,7 @@ class UsersSchema(ma.Schema):
     is_active = ma.fields.Boolean(dump_default=True)
 
     preferences = ma.fields.Nested("UsersPreferencesSchema", only=['display_name'])
-    recipes = ma.fields.Nested("RecipesSchema", many=True, exclude=['created_by'])
+    recipes = ma.fields.Nested("RecipesSchema", many=True, only=['recipe_name', 'recipe_id'])
 
 user_schema = UsersSchema()
 users_schema = UsersSchema(many=True)

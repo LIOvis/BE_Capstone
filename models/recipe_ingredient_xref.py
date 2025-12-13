@@ -20,7 +20,7 @@ class RecipesIngredients(db.Model):
         self.measurement = measurement
 
     def new_recipe_ingredient_obj():
-        return RecipesIngredients("", "", "")
+        return RecipesIngredients(None, None, None)
 
 
 class RecipesIngredientsSchema(ma.Schema):
@@ -29,7 +29,7 @@ class RecipesIngredientsSchema(ma.Schema):
 
     measurement = ma.fields.String(required=True)
 
-    recipe = ma.fields.Nested("RecipesSchema", exclude=['ingredients', 'directions', 'images'])
+    recipe = ma.fields.Nested("RecipesSchema", only=['recipe_name', 'created_by', 'recipe_id'])
     ingredient = ma.fields.Nested("IngredientsSchema", exclude=['recipes'])
 
 

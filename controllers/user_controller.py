@@ -4,6 +4,7 @@ from flask import jsonify, request
 from models.user import Users, user_schema, users_schema
 from lib.authenticate import authenticate_return_auth, authenticate
 from util.reflection import populate_object
+from models.recipe import Recipes
 from db import db
 
 
@@ -26,9 +27,9 @@ def add_user():
         db.session.add(new_user)
         db.session.commit()
 
-    except Exception as e:
+    except:
         db.session.rollback()
-        return jsonify({"message": "unable to add user", "error": str(e)}), 400
+        return jsonify({"message": "unable to add user"}), 400
     
     return jsonify({"message": "user added", "result": user_schema.dump(new_user)}), 201
     
@@ -44,8 +45,9 @@ def get_all_users(auth_info):
 
         for user in users:
             active_recipes = []
-            for recipe in user.recipes:
-                if recipe.is_active == True:
+            for recipe in user["recipes"]:
+                recipe_query = db.session.query(Recipes).filter(Recipes.recipe_id == recipe["recipe_id"]).first()
+                if recipe_query.is_active == True or recipe_query.user_id == auth_info.user_id:
                     active_recipes.append(recipe)
             user["recipes"] = active_recipes
 
@@ -59,7 +61,7 @@ def get_user_by_id(user_id, auth_info):
     query = db.session.query(Users).filter(Users.user_id == user_id).first()
 
     if user_id != auth_info.user_id and auth_info.user.role == 'User':
-        return jsonify({"message": "forbidden: higher role required to view another user"}), 403
+        query = db.session.query(Users).filter(Users.user_id == user_id, Users.is_active == True).first()
 
     if not query:
         return jsonify({"message": "user not found"}), 404
@@ -69,9 +71,9 @@ def get_user_by_id(user_id, auth_info):
 
 @authenticate_return_auth
 def get_logged_in_user(auth_info):
-    query = db.session.query(Users).filter(Users.user_id == auth_info.user_id)
+    query = db.session.query(Users).filter(Users.user_id == auth_info.user_id).first()
 
-    return jsonify ({"message": "user profile found", "result": user_schema.dump(query)})
+    return jsonify ({"message": "user profile found", "result": user_schema.dump(query)}), 200
 
 
 @authenticate_return_auth

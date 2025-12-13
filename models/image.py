@@ -20,7 +20,7 @@ class Images(db.Model):
         self.recipe_id = recipe_id
 
     def new_image_obj():
-        return Images("", "", "")
+        return Images(None, None, None)
 
 
 class ImagesSchema(ma.Schema):
