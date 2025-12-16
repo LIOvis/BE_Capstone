@@ -29,7 +29,7 @@ class CuisinesSchema(ma.Schema):
     cuisine_name = ma.fields.String(required=True)
     is_active = ma.fields.Boolean(dump_default=True)
 
-    recipes = ma.fields.Nested("CuisinesRecipesSchema", exclude=['cuisine'], many=True)
+    recipes = ma.fields.Nested("CuisinesRecipesSchema", exclude=['cuisine', 'recipe.ingredients'], many=True)
 
 
 cuisine_schema = CuisinesSchema()

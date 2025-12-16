@@ -35,7 +35,7 @@ def get_all_ingredients(auth_info):
         for ingredient in ingredients:
             active_recipes = []
             for recipe in ingredient["recipes"]:
-                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                     active_recipes.append(recipe)
             ingredient["recipes"] = active_recipes
 
@@ -54,7 +54,7 @@ def get_ingredient_by_id(ingredient_id, auth_info):
     if auth_info.user.role == "User": 
         active_recipes = []
         for recipe in ingredient["recipes"]:
-            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                 active_recipes.append(recipe)
         ingredient["recipes"] = active_recipes
     

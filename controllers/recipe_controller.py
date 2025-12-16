@@ -20,7 +20,7 @@ def add_recipe(auth_info):
     populate_object(new_recipe, post_data)
 
     if 'user_id' in post_data:
-        if post_data.get('user_id') != auth_info.user_id and auth_info.user.role != 'Super Admin':
+        if post_data.get('user_id') != str(auth_info.user_id) and auth_info.user.role != 'Super Admin':
             return jsonify({"message":  "forbidden: higher role required to add a recipe to another user"}), 403
     else:
             new_recipe.user_id = auth_info.user_id
@@ -117,7 +117,7 @@ def get_all_recipes(auth_info):
     if auth_info.user.role == "User":
         active_recipes = []
         for recipe in recipes:
-            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                 active_recipes.append(recipe)
         recipes = active_recipes
 
@@ -131,8 +131,8 @@ def get_recipe_by_id(recipe_id, auth_info):
     if not query:
         return jsonify({"message": "recipe not found"}), 404
     
-    if auth_info.user.role == "User" and query.is_active == False: 
-        return jsonify({"message": "forbidden: higher role required to view inactive recipe"})
+    if auth_info.user.role == "User" and query.is_active == False and query.user_id != auth_info.user_id: 
+        return jsonify({"message": "forbidden: higher role required to view another user's inactive recipe"})
     
     return jsonify({"message": "recipe found", "result": recipe_schema.dump(query)}), 200
 
@@ -151,7 +151,7 @@ def get_recipes_by_ingredient(ingredient_id, auth_info):
     if auth_info.user.role == "User":
         active_recipes = []
         for recipe in recipes:
-            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                 active_recipes.append(recipe)
         recipes = active_recipes
 
@@ -172,7 +172,7 @@ def get_recipes_by_cuisine(cuisine_id, auth_info):
     if auth_info.user.role == "User":
         active_recipes = []
         for recipe in recipes:
-            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                 active_recipes.append(recipe)
         recipes = active_recipes
 
@@ -190,11 +190,10 @@ def get_recipes_by_user(user_id, auth_info):
 
     recipes = recipes_schema.dump(query)
 
-    if auth_info.user.role == "User":
+    if auth_info.user.role == "User" and str(auth_info.user_id) != user_id:
         active_recipes = []
         for recipe in recipes:
-            recipe_query = db.session.query(Recipes).filter(Recipes.recipe_id == recipe["recipe_id"]).first()
-            if recipe_query.is_active == True or recipe_query.user_id == auth_info.user_id:
+            if recipe["is_active"] == True:
                 active_recipes.append(recipe)
         recipes = active_recipes
 

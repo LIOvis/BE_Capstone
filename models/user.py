@@ -47,4 +47,4 @@ class UsersSchema(ma.Schema):
     recipes = ma.fields.Nested("RecipesSchema", many=True, only=['recipe_name', 'recipe_id'])
 
 user_schema = UsersSchema()
-users_schema = UsersSchema(many=True)
+users_schema = UsersSchema(many=True, exclude=['email', 'role'])

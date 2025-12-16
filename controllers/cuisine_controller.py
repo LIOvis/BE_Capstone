@@ -38,7 +38,7 @@ def get_all_cuisines(auth_info):
         for cuisine in cuisines:
             active_recipes = []
             for recipe in cuisine["recipes"]:
-                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+                if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                     active_recipes.append(recipe)
             cuisine["recipes"] = active_recipes
 
@@ -57,7 +57,7 @@ def get_cuisine_by_id(cuisine_id, auth_info):
     if auth_info.user.role == "User": 
         active_recipes = []
         for recipe in cuisine["recipes"]:
-            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == auth_info.user_id:
+            if recipe["is_active"] == True or recipe["created_by"]["user_id"] == str(auth_info.user_id):
                 active_recipes.append(recipe)
         cuisine["recipes"] = active_recipes
     

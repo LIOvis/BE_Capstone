@@ -13,8 +13,8 @@ class Ingredients(db.Model):
 
     recipes = db.relationship("RecipesIngredients", back_populates="ingredient", cascade="all")
 
-    def __init__(self, name, is_active=True):
-        self.name = name
+    def __init__(self, ingredient_name, is_active=True):
+        self.ingredient_name = ingredient_name
         self.is_active = is_active
 
     def new_ingredient_obj():
@@ -23,10 +23,10 @@ class Ingredients(db.Model):
 
 class IngredientsSchema(ma.Schema):
     class Meta:
-        fields = ['ingredient_id', 'name', 'is_active', 'recipes']
+        fields = ['ingredient_id', 'ingredient_name', 'is_active', 'recipes']
 
     ingredient_id = ma.fields.UUID()
-    name = ma.fields.String(required=True)
+    ingredient_name = ma.fields.String(required=True)
     is_active = ma.fields.Boolean(dump_default=True)
 
     recipes = ma.fields.Nested("RecipesIngredientsSchema", exclude=['ingredient'], many=True)

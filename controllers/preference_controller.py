@@ -10,7 +10,7 @@ from db import db
 def add_user_preference(auth_info):
     post_data = request.form if request.form else request.json
 
-    if 'user_id' in post_data and (post_data.get("user_id") != auth_info.user_id and auth_info.user.role != "Super Admin"):
+    if 'user_id' in post_data and (post_data.get("user_id") != str(auth_info.user_id) and auth_info.user.role != "Super Admin"):
         return jsonify({"message": "forbidden: higher role required to add user preferences to another user"}), 403
     
     new_user_preference = UsersPreferences.new_user_preference_obj()

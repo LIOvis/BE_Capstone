@@ -31,7 +31,7 @@ class ImagesSchema(ma.Schema):
     name = ma.fields.String(required=True)
     file_path = ma.fields.String(required=True)
 
-    recipe = ma.fields.Nested("RecipesSchema", exclude=['images', 'directions'])
+    recipe = ma.fields.Nested("RecipesSchema", exclude=['images', 'directions', 'ingredients', 'cuisines'])
 
 
 image_schema = ImagesSchema()

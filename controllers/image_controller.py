@@ -57,7 +57,7 @@ def get_all_images(auth_info):
 
     if auth_info.user.role == "User":
         for image in images:
-            if image["recipe"]["is_active"] == True or image["recipe"]["user_id"] == auth_info.user_id:
+            if image["recipe"]["is_active"] == True or image["recipe"]["user_id"] == str(auth_info.user_id):
                 images_list.append(image)
     else:
         images_list = images

@@ -51,4 +51,4 @@ class RecipesSchema(ma.Schema):
 
 
 recipe_schema = RecipesSchema()
-recipes_schema = RecipesSchema(many=True)
+recipes_schema = RecipesSchema(many=True, exclude=['directions', 'ingredients'])

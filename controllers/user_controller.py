@@ -110,7 +110,7 @@ def update_user_by_id(user_id, auth_info):
 def delete_user_by_id(user_id, auth_info):
     query = db.session.query(Users).filter(Users.user_id == user_id).first()
 
-    if auth_info.user_id != user_id and auth_info.user.role != "Super Admin":
+    if str(auth_info.user_id) != user_id and auth_info.user.role != "Super Admin":
         return jsonify({"message": "forbidden: higher role required to delete another user"}), 403
     
     if not query:
